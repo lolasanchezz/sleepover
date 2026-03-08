@@ -28,6 +28,12 @@ const navItems = [
     icon: "/background/shop icon.png",
   },
   {
+    label: "Calendar",
+    href: "/portal/calendar",
+    color: "#82A4EC",
+    icon: "/background/calendar icon.svg",
+  },
+  {
     label: "FAQ",
     href: "/faq",
     color: "#869EEC",

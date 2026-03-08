@@ -742,7 +742,7 @@ export async function getGallery() {
       filterByFormula: `{Status} = 'Approved'`,
     })
     .all();
-    
+
   return records.map((r) => ({
     id: r.id,
     project: r.get("Project") as string,
@@ -753,6 +753,134 @@ export async function getGallery() {
     screenshot: r.get("Screenshot") as unknown,
     ysws: r.get("YSWS") as string,
   }));
+}
+
+// ADMIN FUNCTIONS
+
+export async function isAdminUser(userId: string): Promise<boolean> {
+  const safeId = escapeFormulaString(userId);
+  const records = await getUsersTable()
+    .select({
+      filterByFormula: `{id} = '${safeId}'`,
+      maxRecords: 1,
+    })
+    .firstPage();
+  if (!records.length) return false;
+  return records[0].get("is_admin") === true;
+}
+
+export async function getAllSubmissions() {
+  const records = await getReviewTable()
+    .select({
+      sort: [{ field: "Project", direction: "asc" }],
+    })
+    .all();
+
+  return records.map((r) => ({
+    id: r.id,
+    project: r.get("Project") as string,
+    description: r.get("Description") as string,
+    displayname: r.get("displayname") as string,
+    email: r.get("Email") as string,
+    hours: r.get("hours") as number,
+    playableUrl: r.get("Playable URL") as string,
+    codeUrl: r.get("Code URL") as string,
+    screenshot: r.get("Screenshot") as unknown,
+    status: (r.get("Status") as string) || "Pending",
+    ysws: r.get("YSWS") as string,
+    challenge: r.get("Challenge") as string,
+  }));
+}
+
+export async function updateSubmissionStatus(
+  recordId: string,
+  status: "Approved" | "Rejected" | "Pending"
+) {
+  await getReviewTable().update(recordId, { Status: status });
+  return { success: true };
+}
+
+function getCalendarTable() {
+  return getBase()("calendar_events");
+}
+
+export async function getCalendarEvents() {
+  const records = await getCalendarTable()
+    .select()
+    .all();
+
+  return records
+    .map((r) => ({
+      id: r.id,
+      title: (r.get("title") ?? "") as string,
+      date: (r.get("date") ?? "") as string,
+      time: (r.get("time") as string) || undefined,
+      description: (r.get("description") ?? "") as string,
+      type: (r.get("type") ?? "huddle") as "huddle" | "challenge" | "social" | "deadline",
+      joinUrl: (r.get("join_url") as string) || undefined,
+    }))
+    .filter((e) => e.date)
+    .sort((a, b) => a.date.localeCompare(b.date));
+}
+
+export async function createCalendarEvent(event: {
+  title: string;
+  date: string;
+  time?: string;
+  description: string;
+  type: "huddle" | "challenge" | "social" | "deadline";
+  joinUrl?: string;
+}) {
+  const fields: Record<string, string> = {
+    title: event.title,
+    date: event.date,
+    description: event.description,
+    type: event.type,
+  };
+  if (event.time) fields.time = event.time;
+  if (event.joinUrl) fields.join_url = event.joinUrl;
+  const record = await getCalendarTable().create(fields);
+  return {
+    id: record.id,
+    title: (record.get("title") ?? "") as string,
+    date: (record.get("date") ?? "") as string,
+    time: record.get("time") as string | undefined,
+    description: (record.get("description") ?? "") as string,
+    type: (record.get("type") ?? "huddle") as "huddle" | "challenge" | "social" | "deadline",
+    joinUrl: record.get("join_url") as string | undefined,
+  };
+}
+
+export async function updateCalendarEvent(eventId: string, event: {
+  title?: string;
+  date?: string;
+  time?: string | null;
+  description?: string;
+  type?: "huddle" | "challenge" | "social" | "deadline";
+  joinUrl?: string | null;
+}) {
+  const fields: Record<string, unknown> = {};
+  if (event.title !== undefined) fields.title = event.title;
+  if (event.date !== undefined) fields.date = event.date;
+  if (event.time !== undefined) fields.time = event.time ?? "";
+  if (event.description !== undefined) fields.description = event.description;
+  if (event.type !== undefined) fields.type = event.type;
+  if (event.joinUrl !== undefined) fields.join_url = event.joinUrl ?? "";
+  const record = await getCalendarTable().update(eventId, fields as Record<string, string>);
+  return {
+    id: record.id,
+    title: (record.get("title") ?? "") as string,
+    date: (record.get("date") ?? "") as string,
+    time: (record.get("time") as string) || undefined,
+    description: (record.get("description") ?? "") as string,
+    type: (record.get("type") ?? "huddle") as "huddle" | "challenge" | "social" | "deadline",
+    joinUrl: (record.get("join_url") as string) || undefined,
+  };
+}
+
+export async function deleteCalendarEvent(eventId: string) {
+  await getCalendarTable().destroy(eventId);
+  return { success: true };
 }
 
 export async function getAllUsersWithReferralCode() {
