@@ -217,13 +217,12 @@ export default function PortalPage() {
 
             {/* Small box #2 */}
               <SmallBox
-                header="Jan Challenge"
-                body="create a website using any api, spend 10 hours coding, get 3 bonus feathers!!"
+                header="March Challenge"
+                body="Spend 10 hours building a Printed Circuit Board, get 3 bonus feathers!!"
                 isMobile={isMobile}
               >
                 <Link
-                  target="_blank"
-                  href="https://108charlotte.github.io/APIs-Guide-Website/"
+                  href="/portal/march"
                   className="relative flex items-center justify-center rounded-2xl transition-transform hover:scale-105 cursor-pointer mx-auto"
                   style={{
                     width: isMobile ? "140px" : "160px",
