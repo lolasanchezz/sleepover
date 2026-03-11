@@ -28,6 +28,10 @@ export async function shipProject(formData: FormData, projectId: string) {
     throw new Error("Not authorized to ship this project")
   }
 
+  if (!project.desc?.trim()) {
+    throw new Error("Project description is required before shipping")
+  }
+
   // Update project hours in Airtable with fresh data from Hackatime before shipping
   // (only if not a GWC project with manual hours)
   if (project.hackatime_name) {

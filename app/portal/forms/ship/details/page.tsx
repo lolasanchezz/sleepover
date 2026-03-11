@@ -254,17 +254,29 @@ function ShipDetailsContent() {
                   </GradientText>
                 </h3>
                 <div className="flex items-center gap-2 mb-5">
-                  <span
-                    className="text-[20px] md:text-[24px] font-bold underline"
-                    style={{
-                      fontFamily: "'MADE Tommy Soft', sans-serif",
-                      background: "linear-gradient(180deg, #93B4F2 0%, #6988E0 100%)",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                    }}
-                  >
-                    {project.desc}
-                  </span>
+                  {project.desc ? (
+                    <span
+                      className="text-[20px] md:text-[24px] font-bold underline"
+                      style={{
+                        fontFamily: "'MADE Tommy Soft', sans-serif",
+                        background: "linear-gradient(180deg, #93B4F2 0%, #6988E0 100%)",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                      }}
+                    >
+                      {project.desc}
+                    </span>
+                  ) : (
+                    <p
+                      className="text-[16px] md:text-[18px] font-bold"
+                      style={{
+                        fontFamily: "'MADE Tommy Soft', sans-serif",
+                        color: "#D84855",
+                      }}
+                    >
+                      No description yet — go back to your project and add one before shipping!
+                    </p>
+                  )}
                 </div>
 
                 <label
@@ -350,7 +362,8 @@ function ShipDetailsContent() {
             <div className="flex justify-center gap-4">
               <button
                 onClick={handleStep1Yeah}
-                className="relative rounded-[16px] px-6 py-2 transition-transform hover:scale-105"
+                disabled={!project?.desc}
+                className={`relative rounded-[16px] px-6 py-2 transition-transform ${!project?.desc ? "opacity-50 cursor-not-allowed" : "hover:scale-105"}`}
                 style={{
                   background: "linear-gradient(180deg, #869BE7 0%, #B2BDF1 100%)",
                   border: "4px solid white",
