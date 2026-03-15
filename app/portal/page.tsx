@@ -218,11 +218,11 @@ export default function PortalPage() {
             {/* Small box #2 */}
               <SmallBox
                 header="March Challenge"
-                body="Spend 10 hours building a Printed Circuit Board, get 3 bonus feathers!!"
+                body="Build a Printed Circuit Board. Submit it to Sleepover and Stasis to get 2 bonus feathers!!"
                 isMobile={isMobile}
               >
                 <Link
-                  href="/portal/march"
+                  href="/portal/how-to-design-a-pcb"
                   className="relative flex items-center justify-center rounded-2xl transition-transform hover:scale-105 cursor-pointer mx-auto"
                   style={{
                     width: isMobile ? "140px" : "160px",
