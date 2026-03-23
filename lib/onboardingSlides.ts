@@ -46,7 +46,7 @@ export const onboardingSlides: OnboardingSlide[] = [
   {
     id: 5,
     characterName: "Pancake",
-    dialogText: "Code 30 hours (just ten hours a month!) from now until April 5th and come to a sleepover-themed hackathon in Chicago :3",
+    dialogText: "Code 30 hours (just ten hours a month!) from now until April 20th and come to a sleepover-themed hackathon in Chicago :3",
     subText: "click to continue!",
     characterImage: "/background/bunny-talking-turned.png",
     characterPosition: "left",
