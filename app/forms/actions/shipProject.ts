@@ -84,6 +84,7 @@ export async function shipProject(formData: FormData, projectId: string) {
     country: primaryAddress?.country || "",
     ysws: formData.get("ysws") === "true",
     challenge: formData.get("challenge") === "true",
+    isForSnoozefest: formData.get("isForSnoozefest") === "true"
   }
 
   // Input validation

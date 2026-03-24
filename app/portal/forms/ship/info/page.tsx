@@ -112,7 +112,7 @@ function ShipInfoContent() {
       // Convert boolean values from shipData to string booleans for Airtable checkbox fields
       formDataToSend.append("ysws", String(shipData.submittedToYSWS));
       formDataToSend.append("challenge", String(shipData.isMonthlyChallenge));
-
+      formDataToSend.append("isForSnoozefest", String(shipData.isForSnoozefest))
       // Convert base64 screenshot to File if exists
       if (screenshotDataUrl) {
         const [header, base64Data] = screenshotDataUrl.split(",");
