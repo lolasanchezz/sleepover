@@ -19,6 +19,13 @@ function ShipDetailsContent() {
   const searchParams = useSearchParams();
   const projectId = searchParams.get("projectId");
 
+  const shouldShowSnoozefestCheckbox = () => {
+    const start = new Date("2026-03-28T00:00:00Z"); // 8pm est march 27th in utc
+    const end = new Date("2026-03-30T00:30:00Z") // 8:30pm est march 29th in utc
+    const now = new Date()
+    return now >= start && now <= end;
+  };
+
   const [loading, setLoading] = useState(true);
   const [project, setProject] = useState<ProjectData | null>(null);
   const [step1Confirmed, setStep1Confirmed] = useState(false);
@@ -30,6 +37,7 @@ function ShipDetailsContent() {
   const [screenshotError, setScreenshotError] = useState<string | null>(null);
   const [submittedToYSWS, setSubmittedToYSWS] = useState(false);
   const [isMonthlyChallenge, setIsMonthlyChallenge] = useState(false);
+  const [isForSnoozefest, setIsForSnoozefest] = useState(false);
   const [repoUrlError, setRepoUrlError] = useState<string | null>(null);
   const [playableUrlError, setPlayableUrlError] = useState<string | null>(null);
   const [isValidating, setIsValidating] = useState(false);
@@ -142,6 +150,7 @@ function ShipDetailsContent() {
       screenshot: screenshot ? screenshot.name : null,
       submittedToYSWS,
       isMonthlyChallenge,
+      isForSnoozefest
     }));
 
     if (screenshot) {
@@ -642,7 +651,32 @@ function ShipDetailsContent() {
                 </GradientText>
               </label>
             </div>
+            
+            {shouldShowSnoozefestCheckbox() && (
+              <div className="mt-4 mb-4">
+                <label className="flex items-center gap-4 cursor-pointer">
+                  <input
+                    id="challenge"
+                    type="checkbox"
+                    checked={isForSnoozefest}
+                    onChange={(e) => setIsForSnoozefest(e.target.checked)}
+                    className="w-6 h-6 rounded-[6px] accent-[#869BE7] cursor-pointer"
+                    style={{
+                      boxShadow: "0px 2px 4px rgba(116,114,160,0.4)",
+                    }}
+                  />
+                  <GradientText
+                    gradient="#7472A0"
+                    strokeWidth="3px"
+                    className="text-[20px] md:text-[24px]"
+                  >
+                    Was this for snoozefest?
+                  </GradientText>
+                </label>
+              </div>
+            )}
           </div>
+
 
           {/* NEXT buttons */}
           <div className="flex justify-center gap-4">
