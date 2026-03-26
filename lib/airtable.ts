@@ -350,7 +350,7 @@ async function withPurchaseLock<T>(userid: string, fn: () => Promise<T>): Promis
 
 const SINGLE = ["rec4wZN4c2OdkWMnc"]; // Sticker sheet
 
-export async function addProduct(userid: string, product: string, address?: string) {
+export async function addProduct(userid: string, product: string, formData: FormData, address?: string, ) {
   return withPurchaseLock(userid, async () => {
     const safeUserId = escapeFormulaString(userid);
 
@@ -390,7 +390,10 @@ export async function addProduct(userid: string, product: string, address?: stri
       throw new Error("You have already purchased this!");
     }
 
-    if (currentCurrency < price) {
+    const quantity = Math.max(1, Number(formData.get("quantity")) || 1);
+    const totalPrice = price * quantity;
+
+    if (currentCurrency < totalPrice) {
       throw new Error("Insufficient balance");
     }
 
@@ -398,7 +401,7 @@ export async function addProduct(userid: string, product: string, address?: stri
     // Keep `ordered` unique while still allowing repeat purchases via fulfillment rows.
     // fixes the travel grant bug!
     const updatedOrdered = [...new Set([...currentOrdered, product])];
-    const updatedCurrency = currentCurrency - price;
+    const updatedCurrency = currentCurrency - totalPrice;
 
     const freshRecord = await getShopTable().find(record.id);
     const freshCurrency = (freshRecord.get("currency") as number) ?? 0;
@@ -418,7 +421,7 @@ export async function addProduct(userid: string, product: string, address?: stri
       },
     ]);
 
-    addFulfillment(userid, product, address);
+    addFulfillment(userid, product, quantity, address);
 
     return "success";
   });
@@ -440,7 +443,7 @@ export async function hasUserOrderedProduct(userid: string, product: string): Pr
   return currentOrdered.includes(product);
 }
 
-export async function addFulfillment(userid: string, product: string, address?: string) {
+export async function addFulfillment(userid: string, product: string, quantity: number, address?: string) {
   const safeUserId = escapeFormulaString(userid);
   const user = await getUsersTable().select({
     filterByFormula: `{id} = '${safeUserId}'`,
@@ -455,6 +458,7 @@ export async function addFulfillment(userid: string, product: string, address?: 
     product: [product],
     date: date,
     status: "Unfulfilled",
+    quantity: quantity
   };
 
   if (address) {

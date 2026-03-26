@@ -31,7 +31,7 @@ export default function OrderProductPage() {
   const [addresses, setAddresses] = useState<HackClubAddress[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
   const [addressesLoading, setAddressesLoading] = useState(true);
-
+  const [quantity, setQuantity] = useState(1)
   const fetchAddresses = () => {
     setAddressesLoading(true);
     fetch("/api/user/addresses")
@@ -105,10 +105,10 @@ export default function OrderProductPage() {
 
     try {
       const formData = new FormData();
+      formData.set("quantity", String(Math.max(1, quantity || 1)));
       const addressString = selectedAddress ? formatAddress(selectedAddress) : "";
       await orderProduct(formData, prodId, addressString);
-
-      const newBalance = userBalance - product.price;
+      const newBalance = userBalance - product.price * quantity;
       sessionStorage.setItem("userBalance", newBalance.toString());
 
       router.push("/portal/shop");
@@ -272,6 +272,45 @@ export default function OrderProductPage() {
                   </>
                 )}
               </div>
+              {/* set quantity */}
+                 <div className="w-full bg-gradient-to-b flex items-center from-[#c0defe] to-[#9ac6f6] border-4 border-white rounded-2xl px-3 py-2 shadow-[0px_4px_0px_0px_#c6c7e4,0px_6px_8px_0px_rgba(116,114,160,0.69)]">
+                
+                <form className="px-3 md:px-4 py-2">
+           
+              <div className="mb-1 flex items-center gap-2">
+              <label
+                className="text-[20px] md:text-[24px] font-bold whitespace-nowrap"
+                style={{
+                  fontFamily: "'MADE Tommy Soft', sans-serif",
+                  background: "linear-gradient(180deg, #7685CB 0%, #7472A0 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                Quantity:
+              </label>
+              <input
+                name="quantity"
+                type="number"
+                min={1}
+                value={quantity}
+                onChange={(e) => {
+                  const parsed = Number(e.target.value);
+                  setQuantity(Number.isFinite(parsed) && parsed >= 1 ? parsed : 1);
+                }}
+                required
+                className="w-20 rounded-[12px] px-3 py-1.5 text-[#6C6EA0] text-lg outline-none"
+                style={{
+                  fontFamily: "'MADE Tommy Soft', sans-serif",
+                  background: "white",
+                  boxShadow:
+                    "0px 4px 4px rgba(116,114,160,0.62), inset 2px 4px 8px rgba(116,114,160,0.29)",
+                }}
+              />
+            </div>
+            </form>
+              </div>
 
               {/* Add New Address Button */}
               <button
@@ -344,7 +383,7 @@ export default function OrderProductPage() {
                         className="bg-gradient-to-b from-[#7684c9] to-[#7472a0] bg-clip-text text-transparent text-lg md:text-xl font-bold"
                         style={{ fontFamily: "'MADE Tommy Soft', sans-serif" }}
                       >
-                        x1
+                        x{quantity}
                       </span>
                     </div>
                   </div>
@@ -369,7 +408,7 @@ export default function OrderProductPage() {
                         className="bg-gradient-to-b from-[#7684c9] to-[#7472a0] bg-clip-text text-transparent text-lg md:text-xl font-bold"
                         style={{ fontFamily: "'MADE Tommy Soft', sans-serif" }}
                       >
-                        {product?.price}
+                        {product!.price * quantity}
                       </span>
                     </div>
                   </div>
@@ -380,9 +419,9 @@ export default function OrderProductPage() {
               <div className="flex justify-center mt-2">
                 <button
                   onClick={handleOrder}
-                  disabled={submitting || userBalance < (product?.price || 0) || addresses.length === 0}
+                  disabled={submitting || userBalance < (product!.price * quantity || 0) || addresses.length === 0}
                   className={`bg-gradient-to-t from-[#d9daf8] to-[#b5aae7] border-4 border-white rounded-2xl px-12 py-3 shadow-[0px_4px_0px_0px_#c6c7e4,0px_6px_8px_0px_rgba(116,114,160,0.69)] transition-transform ${
-                    submitting || userBalance < (product?.price || 0) || addresses.length === 0
+                    submitting || userBalance < (product!.price * quantity || 0) || addresses.length === 0
                       ? "opacity-50 cursor-not-allowed"
                       : "hover:scale-105"
                   }`}
